@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klein'sche Methode für JAG3D – automatische Kalibrierung des stochastischen Modells in der Netzausgleichung</title>
+<meta name="description" content="Kostenlose Open-Source-Erweiterung für JAG3D: automatische, nachvollziehbare Kalibrierung des stochastischen Modells in der geodätischen Netzausgleichung – Varianzkomponentenschätzung, Erkennung grober Fehler, Analyse der Anschlusspunkte, GNSS-Massendaten. Für Windows, Linux und macOS.">
+<meta name="keywords" content="Netzausgleichung, Ausgleichungsrechnung, stochastisches Modell, Varianzkomponentenschätzung, grobe Fehler, Ausreißer, robuste Schätzung, Anschlusspunkte, GNSS-Basislinien, Tachymeter, Nivellement, JAG3D, Geodäsie, Vermessung, network adjustment, least-squares, variance component estimation, stochastic model, outlier detection, geodesy, surveying">
+<meta name="author" content="Dipl.-Ing. (FH) Stefan Klein">
+<link rel="canonical" href="https://htw9056.github.io/klein-methode/">
+<link rel="alternate" hreflang="de" href="https://htw9056.github.io/klein-methode/">
+<link rel="alternate" hreflang="en" href="https://htw9056.github.io/klein-methode/#english">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Klein'sche Methode für JAG3D">
+<meta property="og:description" content="Automatische, nachvollziehbare Kalibrierung des stochastischen Modells in der geodätischen Netzausgleichung. Open Source, GPL v3.">
+<meta property="og:url" content="https://htw9056.github.io/klein-methode/">
+<meta property="og:image" content="https://htw9056.github.io/klein-methode/klein_methode_vorschau.jpg">
+<meta property="og:locale" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Klein'sche Methode für JAG3D",
+  "alternateName": ["Klein_Method", "Klein method for JAG3D"],
+  "description": "Erweiterung der Ausgleichungssoftware JAG3D zur automatischen, nachvollziehbaren Kalibrierung des stochastischen Modells in der geodätischen Netzausgleichung.",
+  "applicationCategory": "ScientificApplication",
+  "operatingSystem": "Windows, Linux, macOS",
+  "softwareVersion": "V1.00 RC3",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "isAccessibleForFree": true,
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+  "author": {"@type": "Person", "name": "Stefan Klein", "honorificPrefix": "Dipl.-Ing. (FH)"},
+  "url": "https://htw9056.github.io/klein-methode/",
+  "downloadUrl": "https://github.com/htw9056/jag3d-klein-methode/releases/latest",
+  "codeRepository": "https://github.com/htw9056/jag3d-klein-methode",
+  "screenshot": "https://htw9056.github.io/klein-methode/klein_methode_screenshot.jpg",
+  "inLanguage": ["de", "en", "fr", "es", "pt", "pl", "cs"],
+  "keywords": "Netzausgleichung, stochastisches Modell, Varianzkomponentenschätzung, JAG3D, network adjustment, least-squares, geodesy"
+}
+</script>
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d2329; --muted:#56606a; --line:#dcd9d0;
+  --accent:#1f5f8b; --accent-2:#2e7d5b; --code:#eef0ec;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#14181c; --surface:#1c2228; --text:#e6e9ec; --muted:#a3adb7; --line:#2f3740;
+    --accent:#6fb3e0; --accent-2:#6cc49c; --code:#252c33;}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:var(--surface)}
+nav{display:flex;gap:20px;align-items:center;justify-content:space-between;padding:14px 0;flex-wrap:wrap}
+nav .brand{font-weight:700;text-decoration:none;color:var(--text);letter-spacing:.2px}
+nav .links{display:flex;gap:18px;flex-wrap:wrap;font-size:15px}
+nav .links a{text-decoration:none;color:var(--muted)}
+nav .links a:hover{color:var(--accent)}
+.hero{padding:56px 0 28px}
+.eyebrow{font-size:14px;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent-2);font-weight:600;margin:0 0 10px}
+h1{font-size:clamp(30px,4.6vw,46px);line-height:1.15;margin:0 0 16px;letter-spacing:-.5px}
+.lead{font-size:19px;color:var(--muted);max-width:760px;margin:0 0 26px}
+.buttons{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.btn{display:inline-block;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:16px;border:1px solid var(--accent)}
+.btn.primary{background:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){.btn.primary{color:#0e1418}}
+.btn.secondary{color:var(--accent);background:transparent}
+.meta{font-size:14px;color:var(--muted);margin-top:8px}
+figure{margin:30px 0 8px}
+figure img{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;display:block;background:var(--surface)}
+figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+section{padding:34px 0;border-top:1px solid var(--line)}
+h2{font-size:27px;margin:0 0 16px;letter-spacing:-.2px}
+h3{font-size:19px;margin:0 0 6px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 18px 14px}
+.card .num{font-weight:700;color:var(--accent-2);font-size:14px;letter-spacing:1px}
+.card p{margin:6px 0 0;color:var(--muted);font-size:16px}
+ul.features{columns:2;column-gap:36px;padding-left:20px;margin:0}
+ul.features li{break-inside:avoid;margin-bottom:8px}
+@media (max-width:720px){ul.features{columns:1}}
+.note{background:var(--surface);border-left:4px solid var(--accent-2);padding:14px 18px;border-radius:0 8px 8px 0;color:var(--muted);font-size:16px}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;background:var(--code)}
+tr:last-child td{border-bottom:0}
+@media (max-width:520px){table{font-size:15px}th,td{padding:8px 8px}}
+code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:.92em}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;font-size:14px;color:var(--muted)}
+.en{background:var(--surface)}
+.en section{border-top-color:var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <nav aria-label="Navigation">
+      <a class="brand" href="#">Klein'sche Methode für JAG3D</a>
+      <div class="links">
+        <a href="#methode">Methode</a>
+        <a href="#funktionen">Funktionen</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/htw9056/jag3d-klein-methode">GitHub</a>
+        <a href="#english" hreflang="en">English</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <p class="eyebrow">Geodätische Netzausgleichung · Open Source</p>
+    <h1>Klein'sche Methode für JAG3D</h1>
+    <p class="lead">Automatische, nachvollziehbare Kalibrierung des stochastischen Modells in der geodätischen Netzausgleichung – als kostenlose Erweiterung der Ausgleichungssoftware JAG3D (Java·Applied·Geodesy·3D).</p>
+    <div class="buttons">
+      <a class="btn primary" href="https://github.com/htw9056/jag3d-klein-methode/releases/latest">Download (Windows, Linux, macOS)</a>
+      <a class="btn secondary" href="https://github.com/htw9056/jag3d-klein-methode">Quelltext auf GitHub</a>
+    </div>
+    <p class="meta">Version V1.00 RC3 · Lizenz GNU GPL v3 · Verfasser: Dipl.-Ing. (FH) Stefan Klein</p>
+    <figure>
+      <a href="klein_methode_screenshot.jpg"><img src="klein_methode_screenshot.jpg" width="1600" height="939" alt="Reiter „Klein'sche Methode“ in JAG3D mit Ablauf der drei Ausgleichungsstufen, Kennwerten und Protokoll"></a>
+      <figcaption>Der Reiter „Klein'sche Methode“ in JAG3D (synthetisches Beispielnetz).</figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap">
+    <section id="methode">
+      <h2>Worum geht es?</h2>
+      <p>In jeder Netzausgleichung entscheidet das stochastische Modell – die angesetzten Genauigkeiten der Beobachtungen und Anschlusspunkte – darüber, wie Messungen gewichtet, grobe Fehler aufgedeckt und die Genauigkeiten der Ergebnisse angegeben werden. In der Praxis wird es meist von Hand und schrittweise angepasst: Varianzkomponenten schätzen, auffällige Beobachtungen prüfen, Anschlusspunkte bewerten, neu rechnen. Das kostet Zeit und hängt stark von der Erfahrung des Bearbeiters ab.</p>
+      <p>Die Klein'sche Methode führt diesen Weg in drei Stufen geführt und protokolliert durch:</p>
+      <div class="steps">
+        <div class="card"><div class="num">STUFE 1</div><h3>Freie Ausgleichung</h3><p>Kalibrierung der Messungen: Gruppengenauigkeiten werden iterativ und gedämpft per Varianzkomponentenschätzung nachgeführt, danach werden einzelne Beobachtungen abgewichtet, bis jede ihren Test besteht (|logPost| ≤ 2,45).</p></div>
+        <div class="card"><div class="num">STUFE 2</div><h3>Dynamische Ausgleichung</h3><p>Analyse der Anschlusspunkte: Sie werden stochastisch eingeführt und kalibriert. Nicht prüfbare Punkte werden ausdrücklich so ausgewiesen.</p></div>
+        <div class="card"><div class="num">STUFE 3</div><h3>Fixe Ausgleichung</h3><p>Abschließende Kalibrierung der Messungen mit den geprüften Anschlusspunkten.</p></div>
+      </div>
+      <p style="margin-top:20px">Die Erweiterung nutzt ausschließlich die Rechen- und Testverfahren von JAG3D; der Ausgleichungskern bleibt unverändert.</p>
+      <p class="note"><strong>Einordnung:</strong> Das Abwichten einzelner Beobachtungen ist im Kern eine robuste Schätzung und kommt einer impliziten Änderung der Messwerte gleich. Die Methode begrenzt diese Änderung je Beobachtung, meldet grobe Fehler mit ihrer Größe und legt jeden Schritt im Protokoll offen. Sie ersetzt keine fachliche Netzanalyse, sondern nimmt die Routinearbeit ab und benennt Auffälligkeiten, damit der Bearbeiter entscheiden kann.</p>
+    </section>
+
+    <section id="funktionen">
+      <h2>Funktionen</h2>
+      <ul class="features">
+        <li>Dreistufige Kalibrierung (frei → dynamisch → fix) mit Abbruchkriterium und Schutz gegen Schwingen</li>
+        <li>Erkennung grober Fehler mit Angabe der Beobachtung und der Fehlergröße</li>
+        <li>GNSS-Massendaten: Epochen-Basislinien werden je Punktpaar robust zusammengefasst – erprobt mit über 300 000 Basislinien</li>
+        <li>Wiederholte Messungen je Messart zusammenfassen, regewichten oder kalibrieren</li>
+        <li>Plausibilitätsprüfungen beim Import: Näherungskoordinaten, Projektion, Höhensysteme</li>
+        <li>Koordinatenumrechnung WGS84 ↔ lokales System</li>
+        <li>Gitterdateien (z. B. GCG2016) für ellipsoidische Höhen und Normalhöhen</li>
+        <li>Koordinatenexport, z. B. ETRS89/UTM, Gauß-Krüger oder eigene Systeme mit NTv2</li>
+        <li>Netzplot auf OpenStreetMap-Hintergrund mit Konfidenzellipsen</li>
+        <li>Protokoll jedes Schritts, Kalibrierungsnachweis, Importbericht</li>
+        <li>Oberfläche und Hilfe in 7 Sprachen: Deutsch, Englisch, Französisch, Spanisch, Portugiesisch, Polnisch, Tschechisch</li>
+        <li>Optional: anonymer Austausch von Erfahrungswerten (ohne Koordinaten, Punkt- oder Projektnamen)</li>
+      </ul>
+    </section>
+
+    <section id="erprobung">
+      <h2>Erprobung</h2>
+      <p>Getestet an synthetischen Netzen mit bekannter Wahrheit (Nivellement, 2D, 3D-Tachymeter, GNSS, kombinierte Netze, Netze mit groben Fehlern und Massendaten) sowie an elf realen Projekten aus der Praxis mit bis zu 487 Neupunkten und über 300 000 GNSS-Basislinien. Alle erreichten in der fixen Stufe das Abbruchkriterium; die Ergebnisse stimmen mit der Bearbeitung von Hand auf wenige Millimeter überein.</p>
+      <p>Rückmeldungen mit eigenen Netzen – gern mit unabhängigen Kontrollmessungen – sind ausdrücklich erwünscht.</p>
+    </section>
+
+    <section id="download">
+      <h2>Download und Installation</h2>
+      <table>
+        <thead><tr><th>System</th><th>Paket</th><th>Start</th></tr></thead>
+        <tbody>
+          <tr><td>Windows</td><td>Java ist enthalten, keine Installation nötig</td><td>entpacken, <code>jag3d.exe</code></td></tr>
+          <tr><td>Linux</td><td>Java 25 oder neuer erforderlich</td><td>entpacken, <code>./jag3d.sh</code></td></tr>
+          <tr><td>macOS</td><td>Java 25 oder neuer erforderlich</td><td>entpacken, <code>jag3d.command</code></td></tr>
+        </tbody>
+      </table>
+      <div class="buttons" style="margin-top:18px">
+        <a class="btn primary" href="https://github.com/htw9056/jag3d-klein-methode/releases/latest">Zu den Downloads</a>
+        <a class="btn secondary" href="https://github.com/htw9056/jag3d-klein-methode/blob/master/docs/INSTALLATION.md">Installationsanleitung</a>
+      </div>
+      <p class="meta">Fehler melden und Verbesserungen vorschlagen: <a href="https://github.com/htw9056/jag3d-klein-methode/issues">Issues auf GitHub</a></p>
+    </section>
+
+    <section id="lizenz">
+      <h2>Lizenz und Herkunft</h2>
+      <p>Die Klein'sche Methode ist freie Software unter der GNU General Public License v3, © Dipl.-Ing. (FH) Stefan Klein. Sie ist eine <strong>inoffizielle Erweiterung</strong> von <a href="https://software.applied-geodesy.org">JAG3D</a> (© Michael Lösler, GPL v3) und wird vom Autor von JAG3D weder entwickelt noch unterstützt. Fragen zur Erweiterung bitte über GitHub, nicht im JAG3D-Forum.</p>
+    </section>
+  </div>
+
+  <div class="en" id="english" lang="en">
+    <div class="wrap">
+      <section>
+        <h2>English summary</h2>
+        <p><strong>Klein'sche Methode</strong> (Klein method) is a free, open-source extension of the least-squares adjustment software <a href="https://software.applied-geodesy.org">JAG3D</a>. It calibrates the stochastic model of geodetic network adjustments automatically and traceably in three stages – free, dynamic (analysis of connection points) and fixed: iterative variance component estimation with lower bounds, followed by robust down-weighting of individual observations until every observation passes its test (|logPost| ≤ 2.45).</p>
+        <p>It also condenses GNSS mass baselines (tested with more than 300,000 baselines), checks imports, handles height grids and NTv2 grids, exports coordinates in many systems and plots the network on OpenStreetMap. User interface and help are available in seven languages.</p>
+        <div class="buttons">
+          <a class="btn primary" href="https://github.com/htw9056/jag3d-klein-methode/releases/latest">Download for Windows, Linux, macOS</a>
+          <a class="btn secondary" href="https://github.com/htw9056/jag3d-klein-methode">Source code on GitHub</a>
+        </div>
+        <p class="meta">Licensed under GNU GPL v3 · Author: Dipl.-Ing. (FH) Stefan Klein · Unofficial extension, not developed or supported by the author of JAG3D.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    © 2025–2026 Dipl.-Ing. (FH) Stefan Klein · Klein'sche Methode für JAG3D · <a href="https://github.com/htw9056/jag3d-klein-methode">GitHub</a> · Lizenz <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPL v3</a> · Kartendaten im Programm © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende</a>
+  </div>
+</footer>
+</body>
+</html>
